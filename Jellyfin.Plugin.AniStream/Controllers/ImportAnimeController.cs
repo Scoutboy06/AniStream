@@ -1,6 +1,8 @@
+using System.Net.Http.Headers;
 using System.Net.Mime;
+using Jellyfin.Plugin.AniStream.Models;
+using Jellyfin.Plugin.AniStream.Scrapers;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace Jellyfin.Plugin.AniStream.Controllers;
 
@@ -8,7 +10,7 @@ namespace Jellyfin.Plugin.AniStream.Controllers;
 /// Controller for importing anime data into AniStream.
 /// </summary>
 [ApiController]
-[Route("AniStream/[controller]")]
+[Route("AniStream")]
 [Produces(MediaTypeNames.Application.Json)]
 public class ImportAnimeController : ControllerBase
 {
@@ -32,10 +34,36 @@ public class ImportAnimeController : ControllerBase
     /// <summary>
     /// Imports anime data.
     /// </summary>
+    /// <param name="request">The request containing import details.</param>
     /// <returns>A success message.</returns>
     [HttpPost("import")]
-    public IActionResult ImportAnime()
+    public IActionResult ImportAnime([FromBody] ImportAnimeRequest request)
     {
-        return Ok("Anime data imported successfully.");
+        if (request == null)
+        {
+            return BadRequest("Invalid request.");
+        }
+
+        if (!new GogoAnime().CanHandleUrl(request.SourceUrl))
+        {
+            // Handle GogoAnime import logic here
+            return Ok(new
+            {
+                Message = "Source URL is not supported yet.",
+                request.SourceUrl,
+                request.LibraryId,
+                request.LibraryType
+            });
+        }
+
+        // Perform the import logic here using the request data
+
+        return Ok(new
+        {
+            Message = "Anime add request received successfully.",
+            request.SourceUrl,
+            request.LibraryId,
+            request.LibraryType
+        });
     }
 }
