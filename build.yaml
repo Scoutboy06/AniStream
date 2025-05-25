@@ -1,16 +1,19 @@
 ---
-name: "Template"
-guid: "eb5d7894-8eef-4b36-aa6f-5d124e828ce1"
-version: "1.0.0.0"
-targetAbi: "10.9.0.0"
+name: "AniStream"
+guid: "9753bc98-85d7-41b6-a928-7922d02a5ced"
+version: "0.0.0.1"
+targetAbi: "10.8.0.0"
 framework: "net8.0"
-overview: "Short description about your plugin"
+overview: >
+  AniStream is a plugin for Jellyfin that provides access to anime streaming services.
+  It allows users to watch their favorite anime shows and movies directly from the Jellyfin interface.
 description: >
-  This is a longer description that can span more than one
-  line and include details about your plugin.
+  AniStream is a Jellyfin plugin that integrates with various anime streaming services,
+  providing users with a seamless way to access and enjoy anime content. The plugin supports
+  multiple sources, ensuring a wide range of anime titles are available for streaming.
 category: "General"
-owner: "jellyfin"
+owner: "Scoutboy06"
 artifacts:
-- "Jellyfin.Plugin.Template.dll"
+- "Jellyfin.Plugin.AniStream.dll"
 changelog: >
   changelog
