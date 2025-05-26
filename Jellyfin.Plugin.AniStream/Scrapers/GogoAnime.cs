@@ -1,5 +1,7 @@
 using System;
+using System.Net.Http;
 using System.Threading.Tasks;
+using HtmlAgilityPack;
 using Jellyfin.Plugin.AniStream.Models;
 
 namespace Jellyfin.Plugin.AniStream.Scrapers;
@@ -25,9 +27,37 @@ public class GogoAnime : AnimeScraperBase
     }
 
     /// <inheritdoc />
-    public override Task<ScrapedAnimeInfo> GetAnimeInfoByUrl(string url)
+    public override async Task<ScrapedAnimeInfo> GetAnimeInfoByUrl(string url)
     {
-        // Implement the logic to scrape anime information from GogoAnime
-        throw new NotImplementedException("GogoAnime scraping logic is not implemented yet.");
+        if (!CanHandleUrl(url))
+        {
+            throw new NotSupportedException("This url is not supported by the GogoAnime scraper.");
+        }
+
+        using (HttpClient client = new HttpClient())
+        {
+            HttpResponseMessage response = await client.GetAsync(url).ConfigureAwait(false);
+            response.EnsureSuccessStatusCode();
+
+            string html = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+            HtmlDocument document = new HtmlDocument();
+            document.LoadHtml(html);
+
+            string? title = document.DocumentNode.SelectSingleNode("//h2")?.InnerText;
+            if (title != null)
+            {
+                int index = title.LastIndexOf("Episode", StringComparison.Ordinal);
+                if (index != -1)
+                {
+                    title = title.Substring(0, index).Trim();
+                }
+            }
+
+            return new ScrapedAnimeInfo
+            {
+                Title = title,
+            };
+        }
     }
 }

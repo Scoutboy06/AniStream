@@ -1,5 +1,6 @@
 using System.Net.Http.Headers;
 using System.Net.Mime;
+using System.Threading.Tasks;
 using Jellyfin.Plugin.AniStream.Models;
 using Jellyfin.Plugin.AniStream.Scrapers;
 using Microsoft.AspNetCore.Mvc;
@@ -37,33 +38,37 @@ public class ImportAnimeController : ControllerBase
     /// <param name="request">The request containing import details.</param>
     /// <returns>A success message.</returns>
     [HttpPost("import")]
-    public IActionResult ImportAnime([FromBody] ImportAnimeRequest request)
+    public async Task<IActionResult> ImportAnime([FromBody] ImportAnimeRequest request)
     {
         if (request == null)
         {
             return BadRequest("Invalid request.");
         }
 
-        if (!new GogoAnime().CanHandleUrl(request.SourceUrl))
+        if (new GogoAnime().CanHandleUrl(request.SourceUrl))
         {
-            // Handle GogoAnime import logic here
+            ScrapedAnimeInfo? animeInfo = await new GogoAnime().GetAnimeInfoByUrl(request.SourceUrl).ConfigureAwait(false);
+            if (animeInfo == null)
+            {
+                return BadRequest("Failed to scrape anime information from the provided URL.");
+            }
+
             return Ok(new
             {
-                Message = "Source URL is not supported yet.",
-                request.SourceUrl,
-                request.LibraryId,
-                request.LibraryType
+                Message = "Anime information scraped successfully.",
+                data = new
+                {
+                    Title = animeInfo.Title,
+                },
+                request = new
+                {
+                    SourceUrl = request.SourceUrl,
+                    LibraryId = request.LibraryId,
+                    LibraryType = request.LibraryType
+                }
             });
         }
 
-        // Perform the import logic here using the request data
-
-        return Ok(new
-        {
-            Message = "Anime add request received successfully.",
-            request.SourceUrl,
-            request.LibraryId,
-            request.LibraryType
-        });
+        return BadRequest("No suitable scraper found for the provided URL.");
     }
 }
