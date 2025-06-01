@@ -11,6 +11,11 @@ public class ScrapedAnimeInfo
     public string? SourceId { get; set; }
 
     /// <summary>
+    /// Gets or sets the URL of the anime's source page.
+    /// </summary>
+    public string? SourceUrl { get; set; }
+
+    /// <summary>
     /// Gets or sets the title of the anime.
     /// </summary>
     public string? Title { get; set; }
@@ -21,7 +26,7 @@ public class ScrapedAnimeInfo
     public string? Description { get; set; }
 
     /// <summary>
-    /// Gets or sets the URL of the anime's source page.
+    /// Gets or sets the release year of the anime.
     /// </summary>
-    public string? SourceUrl { get; set; }
+    public string? Year { get; set; }
 }

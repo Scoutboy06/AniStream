@@ -25,6 +25,8 @@
   <ItemGroup>
     <None Remove="Configuration\configPage.html" />
     <EmbeddedResource Include="Configuration\configPage.html" />
+    <None Remove="wwwroot\identify-shows.js" />
+    <EmbeddedResource Include="wwwroot\identify-shows.js" />
   </ItemGroup>
 
 </Project>

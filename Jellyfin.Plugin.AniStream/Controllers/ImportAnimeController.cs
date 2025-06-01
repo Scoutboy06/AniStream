@@ -1,3 +1,4 @@
+using System;
 using System.Net.Http.Headers;
 using System.Net.Mime;
 using System.Threading.Tasks;
@@ -45,30 +46,31 @@ public class ImportAnimeController : ControllerBase
             return BadRequest("Invalid request.");
         }
 
-        if (new GogoAnime().CanHandleUrl(request.SourceUrl))
+        Uri uri = new Uri(request.SourceUrl);
+        if (!new GogoAnime().CanHandleUri(uri))
         {
-            ScrapedAnimeInfo? animeInfo = await new GogoAnime().GetAnimeInfoByUrl(request.SourceUrl).ConfigureAwait(false);
-            if (animeInfo == null)
-            {
-                return BadRequest("Failed to scrape anime information from the provided URL.");
-            }
-
-            return Ok(new
-            {
-                Message = "Anime information scraped successfully.",
-                data = new
-                {
-                    Title = animeInfo.Title,
-                },
-                request = new
-                {
-                    SourceUrl = request.SourceUrl,
-                    LibraryId = request.LibraryId,
-                    LibraryType = request.LibraryType
-                }
-            });
+            return BadRequest("No suitable scraper found for the provided URL.");
         }
 
-        return BadRequest("No suitable scraper found for the provided URL.");
+        ScrapedAnimeInfo? animeInfo = await new GogoAnime().GetAnimeInfoByUrl(uri).ConfigureAwait(false);
+        if (animeInfo == null)
+        {
+            return BadRequest("Failed to scrape anime information from the provided URL.");
+        }
+
+        return Ok(new
+        {
+            Message = "Anime information scraped successfully.",
+            data = new
+            {
+                Title = animeInfo.Title,
+            },
+            request = new
+            {
+                SourceUrl = request.SourceUrl,
+                LibraryId = request.LibraryId,
+                LibraryType = request.LibraryType
+            }
+        });
     }
 }
